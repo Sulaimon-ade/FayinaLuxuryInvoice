@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mobile-first responsive styles */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  h1.text-3xl {
+    font-size: 1.5rem;
+  }
+
+  .overflow-x-auto {
+    margin: 0 -1rem;
+    padding: 0 1rem;
+    width: calc(100% + 2rem);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  #invoice-preview {
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+  }
+}
