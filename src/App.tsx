@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 import { Toaster, toast } from 'react-hot-toast';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, FileText, Ruler } from 'lucide-react';
 import InvoiceForm from './components/invoice/InvoiceForm';
 import InvoicePreview from './components/invoice/InvoicePreview';
 import InvoiceList from './components/invoice/InvoiceList';
+import MeasurementsForm from './components/measurements/MeasurementsForm';
+import MeasurementsList from './components/measurements/MeasurementsList';
 import LoginButton from './components/auth/LoginButton';
 import { InvoiceData, DatabaseInvoice } from './types';
 import { generateInvoiceNumber } from './utils/generateInvoiceNumber';
@@ -194,143 +197,201 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Toaster position="top-right" />
-      
-      <header className="bg-indigo-900 text-white py-6 shadow-md">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-serif font-bold">Fayina Luxury Couture</h1>
-              <p className="text-indigo-200">Invoice Generator</p>
-            </div>
-            <div>
-              {user ? (
-                <button
-                  onClick={handleSignOut}
-                  className="bg-indigo-800 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  Sign Out
-                </button>
-              ) : (
-                <LoginButton />
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-      
-      <main className="container mx-auto px-4 py-8">
-        {!user && !loading && (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-4">
-              Sign in to manage your invoices
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Create, save, and manage all your invoices in one place.
-            </p>
-            <LoginButton />
-          </div>
-        )}
-
-        {user && (
-          <>
-            {mode === 'list' && (
-              <div className="mb-6">
-                <button 
-                  onClick={handleNewInvoice}
-                  className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  <PlusCircle size={20} /> Create New Invoice
-                </button>
-              </div>
-            )}
-
-            {mode !== 'list' && (
-              <div className="flex justify-center mb-6">
-                <nav className="inline-flex bg-white rounded-lg shadow p-1">
-                  <button 
-                    onClick={() => setMode('list')}
-                    className="px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
-                  >
-                    Back to List
-                  </button>
-                  <button 
-                    onClick={() => setMode('edit')}
-                    className={`px-4 py-2 rounded-md transition-colors ${
-                      mode === 'edit' 
-                        ? 'bg-indigo-100 text-indigo-800 font-medium' 
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    Edit Invoice
-                  </button>
-                  <button 
-                    onClick={() => setMode('preview')}
-                    className={`px-4 py-2 rounded-md transition-colors ${
-                      mode === 'preview' 
-                        ? 'bg-indigo-100 text-indigo-800 font-medium' 
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    Preview Invoice
-                  </button>
-                </nav>
-              </div>
-            )}
-            
-            {mode === 'list' && (
-              loading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Loading invoices...</p>
-                </div>
-              ) : (
-                <InvoiceList 
-                  invoices={invoices}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onView={handleView}
-                />
-              )
-            )}
-            
-            {mode === 'edit' && (
-              <InvoiceForm 
-                invoiceData={invoiceData} 
-                setInvoiceData={setInvoiceData} 
-                onSave={handleSave}
-                onPrint={handlePrint}
-              />
-            )}
-            
-            {mode === 'preview' && (
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-100">
+        <Toaster position="top-right" />
+        
+        <header className="bg-indigo-900 text-white py-6 shadow-md">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center">
               <div>
-                <InvoicePreview invoiceData={invoiceData} />
-                <div className="flex justify-center mt-6">
-                  <button 
-                    onClick={() => setMode('edit')}
-                    className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg mr-4 hover:bg-gray-300 transition-colors"
-                  >
-                    Back to Edit
-                  </button>
-                  <button 
-                    onClick={handlePrint}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-                  >
-                    Export to PDF
-                  </button>
-                </div>
+                <h1 className="text-3xl font-serif font-bold">Fayina Luxury Couture</h1>
+                <p className="text-indigo-200">Management System</p>
               </div>
+              <div>
+                {user ? (
+                  <button
+                    onClick={handleSignOut}
+                    className="bg-indigo-800 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                ) : (
+                  <LoginButton />
+                )}
+              </div>
+            </div>
+            
+            {user && (
+              <nav className="mt-4">
+                <ul className="flex space-x-4">
+                  <li>
+                    <Link
+                      to="/"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors"
+                    >
+                      <FileText size={20} />
+                      Invoices
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/measurements"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors"
+                    >
+                      <Ruler size={20} />
+                      Measurements
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
             )}
-          </>
-        )}
-      </main>
-      
-      <footer className="bg-gray-800 text-gray-400 py-4 text-center text-sm">
-        <p>© {new Date().getFullYear()} Fayina Luxury Couture. All rights reserved.</p>
-      </footer>
-    </div>
+          </div>
+        </header>
+        
+        <main className="container mx-auto px-4 py-8">
+          {!user && !loading && (
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-4">
+                Sign in to manage your business
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Create invoices and manage client measurements in one place.
+              </p>
+              <LoginButton />
+            </div>
+          )}
+
+          {user && (
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <>
+                    {mode === 'list' && (
+                      <div className="mb-6">
+                        <button 
+                          onClick={handleNewInvoice}
+                          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                        >
+                          <PlusCircle size={20} /> Create New Invoice
+                        </button>
+                      </div>
+                    )}
+
+                    {mode !== 'list' && (
+                      <div className="flex justify-center mb-6">
+                        <nav className="inline-flex bg-white rounded-lg shadow p-1">
+                          <button 
+                            onClick={() => setMode('list')}
+                            className="px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
+                          >
+                            Back to List
+                          </button>
+                          <button 
+                            onClick={() => setMode('edit')}
+                            className={`px-4 py-2 rounded-md transition-colors ${
+                              mode === 'edit' 
+                                ? 'bg-indigo-100 text-indigo-800 font-medium' 
+                                : 'text-gray-600 hover:bg-gray-100'
+                            }`}
+                          >
+                            Edit Invoice
+                          </button>
+                          <button 
+                            onClick={() => setMode('preview')}
+                            className={`px-4 py-2 rounded-md transition-colors ${
+                              mode === 'preview' 
+                                ? 'bg-indigo-100 text-indigo-800 font-medium' 
+                                : 'text-gray-600 hover:bg-gray-100'
+                            }`}
+                          >
+                            Preview Invoice
+                          </button>
+                        </nav>
+                      </div>
+                    )}
+                    
+                    {mode === 'list' && (
+                      loading ? (
+                        <div className="text-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+                          <p className="mt-2 text-gray-600">Loading invoices...</p>
+                        </div>
+                      ) : (
+                        <InvoiceList 
+                          invoices={invoices}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                          onView={handleView}
+                        />
+                      )
+                    )}
+                    
+                    {mode === 'edit' && (
+                      <InvoiceForm 
+                        invoiceData={invoiceData} 
+                        setInvoiceData={setInvoiceData} 
+                        onSave={handleSave}
+                        onPrint={handlePrint}
+                      />
+                    )}
+                    
+                    {mode === 'preview' && (
+                      <div>
+                        <InvoicePreview invoiceData={invoiceData} />
+                        <div className="flex justify-center mt-6">
+                          <button 
+                            onClick={() => setMode('edit')}
+                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg mr-4 hover:bg-gray-300 transition-colors"
+                          >
+                            Back to Edit
+                          </button>
+                          <button 
+                            onClick={handlePrint}
+                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                          >
+                            Export to PDF
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                }
+              />
+              <Route
+                path="/measurements"
+                element={
+                  <div>
+                    <div className="mb-6">
+                      <Link
+                        to="/measurements/new"
+                        className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors inline-flex"
+                      >
+                        <PlusCircle size={20} /> Add New Measurements
+                      </Link>
+                    </div>
+                    <MeasurementsList />
+                  </div>
+                }
+              />
+              <Route
+                path="/measurements/new"
+                element={<MeasurementsForm />}
+              />
+              <Route
+                path="/measurements/edit/:id"
+                element={<MeasurementsForm />}
+              />
+            </Routes>
+          )}
+        </main>
+        
+        <footer className="bg-gray-800 text-gray-400 py-4 text-center text-sm">
+          <p>© {new Date().getFullYear()} Fayina Luxury Couture. All rights reserved.</p>
+        </footer>
+      </div>
+    </BrowserRouter>
   );
 }
 
