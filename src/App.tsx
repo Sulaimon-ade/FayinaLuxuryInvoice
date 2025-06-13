@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 import { Toaster, toast } from 'react-hot-toast';
-import { PlusCircle, FileText, Ruler } from 'lucide-react';
+import { PlusCircle, FileText, Ruler, Wallet, CheckSquare } from 'lucide-react';
 import InvoiceForm from './components/invoice/InvoiceForm';
 import InvoicePreview from './components/invoice/InvoicePreview';
 import InvoiceList from './components/invoice/InvoiceList';
 import MeasurementsForm from './components/measurements/MeasurementsForm';
 import MeasurementsList from './components/measurements/MeasurementsList';
+import FinancialDashboard from './components/financials/FinancialDashboard';
+import TodoDashboard from './components/todos/TodoDashboard';
 import LoginButton from './components/auth/LoginButton';
 import { InvoiceData, DatabaseInvoice } from './types';
 import { generateInvoiceNumber } from './utils/generateInvoiceNumber';
@@ -41,6 +43,7 @@ function App() {
   const [invoices, setInvoices] = useState<DatabaseInvoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
@@ -96,16 +99,34 @@ function App() {
     try {
       const dbInvoice = toDatabase(invoiceData);
       
-      const { data, error } = await supabase
-        .from('invoices')
-        .insert([{ ...dbInvoice, user_id: user.id }])
-        .select()
-        .single();
+      if (editingInvoiceId) {
+        // Update existing invoice
+        const { data, error } = await supabase
+          .from('invoices')
+          .update(dbInvoice)
+          .eq('id', editingInvoiceId)
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast.success('Invoice saved successfully!');
-      setInvoiceData(fromDatabase(data as DatabaseInvoice));
+        toast.success('Invoice updated successfully!');
+        setInvoiceData(fromDatabase(data as DatabaseInvoice));
+      } else {
+        // Create new invoice
+        const { data, error } = await supabase
+          .from('invoices')
+          .insert([{ ...dbInvoice, user_id: user.id }])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        toast.success('Invoice saved successfully!');
+        setInvoiceData(fromDatabase(data as DatabaseInvoice));
+        setEditingInvoiceId(data.id);
+      }
+
       await fetchInvoices();
       setMode('list');
     } catch (error) {
@@ -140,11 +161,13 @@ function App() {
 
   const handleEdit = (invoice: DatabaseInvoice) => {
     setInvoiceData(fromDatabase(invoice));
+    setEditingInvoiceId(invoice.id);
     setMode('edit');
   };
 
   const handleView = (invoice: DatabaseInvoice) => {
     setInvoiceData(fromDatabase(invoice));
+    setEditingInvoiceId(invoice.id);
     setMode('preview');
   };
 
@@ -189,6 +212,7 @@ function App() {
       receivedAmount: 0,
       notes: '',
     });
+    setEditingInvoiceId(null);
     setMode('edit');
   };
 
@@ -243,6 +267,24 @@ function App() {
                       Measurements
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      to="/financials"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors"
+                    >
+                      <Wallet size={20} />
+                      Financials
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/orders"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors"
+                    >
+                      <CheckSquare size={20} />
+                      Orders
+                    </Link>
+                  </li>
                 </ul>
               </nav>
             )}
@@ -256,7 +298,7 @@ function App() {
                 Sign in to manage your business
               </h2>
               <p className="text-gray-600 mb-6">
-                Create invoices and manage client measurements in one place.
+                Create invoices, manage client measurements, and track orders in one place.
               </p>
               <LoginButton />
             </div>
@@ -283,7 +325,10 @@ function App() {
                       <div className="flex justify-center mb-6">
                         <nav className="inline-flex bg-white rounded-lg shadow p-1">
                           <button 
-                            onClick={() => setMode('list')}
+                            onClick={() => {
+                              setMode('list');
+                              setEditingInvoiceId(null);
+                            }}
                             className="px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
                           >
                             Back to List
@@ -382,6 +427,14 @@ function App() {
               <Route
                 path="/measurements/edit/:id"
                 element={<MeasurementsForm />}
+              />
+              <Route
+                path="/financials"
+                element={<FinancialDashboard />}
+              />
+              <Route
+                path="/orders"
+                element={<TodoDashboard />}
               />
             </Routes>
           )}
