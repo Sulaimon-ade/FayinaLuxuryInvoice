@@ -20,6 +20,29 @@
   }
 }
 
+/* Navigation scrolling styles */
+nav .overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+nav .overflow-x-auto::-webkit-scrollbar {
+  height: 4px;
+}
+
+nav .overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+nav .overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+nav .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
 /* Print styles */
 @media print {
   .no-print {

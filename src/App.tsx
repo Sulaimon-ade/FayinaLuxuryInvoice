@@ -248,44 +248,47 @@ function App() {
             
             {user && (
               <nav className="mt-4">
-                <ul className="flex space-x-4">
-                  <li>
-                    <Link
-                      to="/"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors"
-                    >
-                      <FileText size={20} />
-                      Invoices
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/measurements"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors"
-                    >
-                      <Ruler size={20} />
-                      Measurements
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/financials"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors"
-                    >
-                      <Wallet size={20} />
-                      Financials
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/orders"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors"
-                    >
-                      <CheckSquare size={20} />
-                      Orders
-                    </Link>
-                  </li>
-                </ul>
+                {/* Mobile: Horizontal scrolling navigation */}
+                <div className="overflow-x-auto">
+                  <ul className="flex space-x-4 min-w-max pb-2">
+                    <li>
+                      <Link
+                        to="/"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors whitespace-nowrap"
+                      >
+                        <FileText size={20} />
+                        Invoices
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/measurements"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors whitespace-nowrap"
+                      >
+                        <Ruler size={20} />
+                        Measurements
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/financials"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors whitespace-nowrap"
+                      >
+                        <Wallet size={20} />
+                        Financials
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/orders"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors whitespace-nowrap"
+                      >
+                        <CheckSquare size={20} />
+                        Orders
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
               </nav>
             )}
           </div>
